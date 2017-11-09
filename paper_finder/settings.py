@@ -15,6 +15,7 @@ BOT_NAME = 'paper_finder'
 
 # springer Api
 SPRINGER_API_KEY = None
+IEEE_API_KEY = None
 
 #  }}} API KEYS #
 
