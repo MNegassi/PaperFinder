@@ -1,4 +1,4 @@
-from paper_finder.paper_spider import PaperSpider
+from paper_finder.paper_spiders import PaperSpider
 
 
 class ArxivSpider(PaperSpider):
@@ -54,10 +54,10 @@ class ArxivSpider(PaperSpider):
         for title, abstract, date, journal, pdf_href in paper_info:
             yield {
                 "query": response.url,
-                "pdf_href": pdf_href,
+                "href": pdf_href,
                 "title": title,
                 "abstract": abstract,
-                "date:": date,
+                "date": date,
                 "journal": journal,
                 "origin": self.name
             }

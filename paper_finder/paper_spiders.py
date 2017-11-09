@@ -15,8 +15,8 @@ class PaperSpider(Spider):
         # will check that.
 
         expected_output_keys = {
-            'query', 'date:', 'origin', 'title',
-            'journal', 'abstract', 'pdf_href'
+            'query', 'date', 'origin', 'title',
+            'journal', 'abstract', 'href'
         }
 
         @wraps(parse_fun)
@@ -38,3 +38,14 @@ class PaperSpider(Spider):
     @abc.abstractmethod
     def parse(self, response):
         raise NotImplementedError("Not implemented in base class!")
+
+
+class ScraperPaperSpider(PaperSpider):
+    # XXX Collect scraper specific stuff here
+    __metaclass__ = abc.ABCMeta
+
+
+class APIKeyMissing(ValueError):
+    """ Raised if an API requires a key and that key was not provided.
+        Keys are set in 'paper_finder/settings.py' and imported from there.
+    """
