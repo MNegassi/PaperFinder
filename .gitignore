@@ -99,3 +99,6 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# do not version control settings.py, to avoid publishing personal api keys
+paper_finder/settings.py
