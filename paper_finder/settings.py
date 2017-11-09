@@ -11,6 +11,13 @@
 
 BOT_NAME = 'paper_finder'
 
+#  API KEYS {{{ #
+
+# springer Api
+SPRINGER_API_KEY = None
+
+#  }}} API KEYS #
+
 SPIDER_MODULES = ['paper_finder.spiders']
 NEWSPIDER_MODULE = 'paper_finder.spiders'
 
