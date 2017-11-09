@@ -4,6 +4,16 @@ import argparse
 from subprocess import check_output
 
 
+class APINotSupported(ValueError):
+    """ Raised if an API was specified that we do not support. """
+    def __init__(self, api, supported_apis):
+        super().__init__(
+            "Requested api '{api}' is not supported. "
+            "Supported apis are:\n-"
+            "{apis}".format(api=api, apis="\n-".join(supported_apis))
+        )
+
+
 def list_apis(args):
     spiders = [
         spider_name for spider_name in
@@ -23,15 +33,28 @@ def query_apis(args):
     from itertools import chain as iter_chain
 
     # Iterator over all our spider classes
-    spider_iter = iter_chain(*[
+    spiders = iter_chain(*[
         iter_spider_classes(module)
         for module in walk_modules("paper_finder.spiders")
     ])
 
+    if args.apis:
+        apis = {api.strip() for api in args.apis.split(",")}
+
+        spider_names = {spider.name for spider in spiders}
+
+        for api in apis:
+            if api not in spider_names:
+                raise APINotSupported(
+                    api=api, supported_apis=sorted(spider_names)
+                )
+
+        spiders = {
+            spider for spider in spiders if spider.name in apis
+        }
+
     crawler_process = CrawlerProcess(get_project_settings())
-    for spider in spider_iter:
-        # name = spider.name is_scraper = spider.is_scraper
-        # XXX Remove hardcoded query
+    for spider in spiders:
         if not args.scrape and isinstance(spider, ScraperPaperSpider):
             continue
         crawler_process.crawl(spider, query=args.search_term)
@@ -59,6 +82,11 @@ def main():
     )
 
     find_papers_parser.add_argument(
+        "--apis", help="Use only the given (comma-seperated list of) API's.",
+        default=None, dest="apis", action="store"
+    )
+
+    find_papers_parser.add_argument(
         "--scrape",
         help="Boolean flag that turns on scraping for papers. "
              "Note that scraping may be disallowed by some information sources "
@@ -76,7 +104,6 @@ def main():
     results = args.fun(args)
     if args.fun.__name__ == "list_apis":
         print("\n".join(sorted(results)))
-
 
 
 if __name__ == "__main__":

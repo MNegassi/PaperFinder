@@ -1,5 +1,4 @@
 def dig_dictionary(dictionary, *keys, fill_value=None, fail=False):
-
     current_level = dictionary
     for key in keys:
         print(current_level, type(current_level))
