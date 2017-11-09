@@ -2,26 +2,26 @@ import json
 
 from paper_finder.paper_spiders import PaperSpider, APIKeyMissing
 from paper_finder.scraping_utils import dig_dictionary
-from paper_finder.settings import SPRINGER_API_KEY
+from paper_finder.settings import IEEE_API_KEY
 
 
-class SpringerSpider(PaperSpider):
-    name = "Springer"
-    search_url = "http://api.springer.com/metadata/json?q={keyword}&api_key={api_key}"
+class IEEESpider(PaperSpider):
+    name = "IEEE"
+    search_url = "http://ieeexploreapi.ieee.org/api/v1/search/articles?querytext=({keyword})&apikey={api_key}"
 
     def __init__(self, query, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        if SPRINGER_API_KEY is None:
+        if IEEE_API_KEY is None:
             raise APIKeyMissing(
-                "Please provide an API key for the api: 'Springer'.\n"
-                "Set your key by assigning to variable 'SPRINGER_API_KEY' in "
+                "Please provide an API key for the api: 'IEEE'.\n"
+                "Set your key by assigning to variable 'IEEE_API_KEY' in "
                 "the file 'paper_finder/settings.py'."
             )
 
         self.start_urls = [
             self.query_keyword(
-                keyword=query, api_key=SPRINGER_API_KEY
+                keyword=query, api_key=IEEE_API_KEY
             )
         ]
 
@@ -32,8 +32,10 @@ class SpringerSpider(PaperSpider):
 
     @PaperSpider._assert_output_format
     def parse(self, response):
-        json_results = json.loads(response.body_as_unicode())
+        raise NotImplementedError()
+        # json_results = json.loads(response.body_as_unicode())
 
+        """
         for record in json_results["records"]:
             yield {
                 "query": response.url,
@@ -48,3 +50,4 @@ class SpringerSpider(PaperSpider):
 
                 "origin": self.name
             }
+        """
