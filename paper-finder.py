@@ -73,7 +73,11 @@ def main():
 
     args = parser.parse_args()
 
-    args.fun(args)
+    results = args.fun(args)
+    if args.fun.__name__ == "list_apis":
+        print("\n".join(sorted(results)))
+
+
 
 if __name__ == "__main__":
     main()

@@ -1,5 +1,3 @@
-
-
 def dig_dictionary(dictionary, *keys, fill_value=None, fail=False):
 
     current_level = dictionary
