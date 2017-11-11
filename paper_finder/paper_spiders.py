@@ -6,6 +6,18 @@ from functools import wraps
 class PaperSpider(Spider):
     __metaclass__ = abc.ABCMeta
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.start_urls = [
+            self.query_keyword(**kwargs)
+
+        ]
+
+    def query_keyword(self, **kwargs):
+        return self.search_url.format(
+            **kwargs
+        )
+
     @classmethod
     def _assert_output_format(cls, parse_fun):
         # assert that parse_fun returns properly formatted dictionaries
@@ -30,10 +42,6 @@ class PaperSpider(Spider):
 
             yield from return_dicts
         return wrapped
-
-    @abc.abstractmethod
-    def query_keyword(self, **kwargs):
-        raise NotImplementedError("Not implemented in base class!")
 
     @abc.abstractmethod
     def parse(self, response):

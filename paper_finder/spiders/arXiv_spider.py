@@ -3,21 +3,11 @@ from paper_finder.paper_spiders import PaperSpider
 
 class ArxivSpider(PaperSpider):
     name = "arXiv"
-    search_url = "http://export.arxiv.org/api/query?search_query=all:{keyword}&start=0&max_results={max_results}"
+    search_url = "http://export.arxiv.org/api/query?search_query=all:{query}&start=0&max_results={max_results}"
 
     def __init__(self, query, max_results=1, *args, **kwargs):
+        kwargs.update({"query": query, "max_results": max_results})
         super().__init__(*args, **kwargs)
-        self.start_urls = [
-            self.query_keyword(
-                keyword=query, max_results=int(max_results)
-            )
-
-        ]
-
-    def query_keyword(self, **kwargs):
-        return self.search_url.format(
-            **kwargs
-        )
 
     @PaperSpider._assert_output_format
     def parse(self, response):

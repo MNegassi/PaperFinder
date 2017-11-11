@@ -7,11 +7,9 @@ from paper_finder.settings import IEEE_API_KEY
 
 class IEEESpider(PaperSpider):
     name = "IEEE"
-    search_url = "http://ieeexploreapi.ieee.org/api/v1/search/articles?querytext=({keyword})&apikey={api_key}"
+    search_url = "http://ieeexploreapi.ieee.org/api/v1/search/articles?querytext=({query})&apikey={api_key}"
 
     def __init__(self, query, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
         if IEEE_API_KEY is None:
             raise APIKeyMissing(
                 "Please provide an API key for the api: 'IEEE'.\n"
@@ -19,16 +17,8 @@ class IEEESpider(PaperSpider):
                 "the file 'paper_finder/settings.py'."
             )
 
-        self.start_urls = [
-            self.query_keyword(
-                keyword=query, api_key=IEEE_API_KEY
-            )
-        ]
-
-    def query_keyword(self, **kwargs):
-        return self.search_url.format(
-            **kwargs
-        )
+        kwargs.update({"query": query, "api_key": IEEE_API_KEY})
+        super().__init__(*args, **kwargs)
 
     @PaperSpider._assert_output_format
     def parse(self, response):

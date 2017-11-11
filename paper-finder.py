@@ -15,6 +15,7 @@ class APINotSupported(ValueError):
 
 
 def list_apis(args):
+    """ Return a list of all supported sources of information. """
     spiders = [
         spider_name for spider_name in
         map(lambda spider: spider.strip(),
@@ -25,6 +26,7 @@ def list_apis(args):
 
 
 def query_apis(args):
+    """ Query sources of information with given query arguments `args`. """
     from paper_finder.paper_spiders import ScraperPaperSpider
     from scrapy.crawler import CrawlerProcess
     from scrapy.utils.misc import walk_modules
@@ -39,21 +41,26 @@ def query_apis(args):
     ])
 
     if args.apis:
+        spiders = set(spiders)
         apis = {api.strip() for api in args.apis.split(",")}
 
         spider_names = {spider.name for spider in spiders}
 
+        #  sanitize user-specified apis - ensure they all exist {{{ #
         for api in apis:
             if api not in spider_names:
                 raise APINotSupported(
                     api=api, supported_apis=sorted(spider_names)
                 )
 
+        #  }}} sanitize user-specified apis - ensure they all exist #
+
         spiders = {
             spider for spider in spiders if spider.name in apis
         }
 
     crawler_process = CrawlerProcess(get_project_settings())
+
     for spider in spiders:
         if not args.scrape and isinstance(spider, ScraperPaperSpider):
             continue
@@ -66,12 +73,17 @@ def main():
 
     subparsers = parser.add_subparsers()
 
+    #  List Supported Information Sources {{{ #
+
     list_apis_parser = subparsers.add_parser(
         "list", help="List all supported information sources."
     )
 
     list_apis_parser.set_defaults(fun=list_apis)
 
+    #  }}} List Supported Information Sources #
+
+    #  Find Papers {{{ #
     find_papers_parser = subparsers.add_parser(
         "find",
         help="Query (all) information sources for papers matching the given TERM."
@@ -98,6 +110,8 @@ def main():
     )
 
     find_papers_parser.set_defaults(fun=query_apis)
+
+    #  }}} Find Papers #
 
     args = parser.parse_args()
 

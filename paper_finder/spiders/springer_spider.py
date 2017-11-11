@@ -7,10 +7,9 @@ from paper_finder.settings import SPRINGER_API_KEY
 
 class SpringerSpider(PaperSpider):
     name = "Springer"
-    search_url = "http://api.springer.com/metadata/json?q={keyword}&api_key={api_key}"
+    search_url = "http://api.springer.com/metadata/json?q={query}&api_key={api_key}"
 
     def __init__(self, query, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
         if SPRINGER_API_KEY is None:
             raise APIKeyMissing(
@@ -19,16 +18,9 @@ class SpringerSpider(PaperSpider):
                 "the file 'paper_finder/settings.py'."
             )
 
-        self.start_urls = [
-            self.query_keyword(
-                keyword=query, api_key=SPRINGER_API_KEY
-            )
-        ]
+        kwargs.update({"query": query, "api_key": SPRINGER_API_KEY})
 
-    def query_keyword(self, **kwargs):
-        return self.search_url.format(
-            **kwargs
-        )
+        super().__init__(*args, **kwargs)
 
     @PaperSpider._assert_output_format
     def parse(self, response):
